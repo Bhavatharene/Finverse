@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>finVerse | Admin Control Center</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  :root {
+    --primary: #6366f1;
+    --primary-dark: #4f46e5;
+    --secondary: #ec489a;
+    --success: #10b981;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --info: #3b82f6;
+    --dark: #0f172a;
+    --light: #f8fafc;
+    --gray-50: #f9fafb;
+    --gray-100: #f1f5f9;
+    --gray-200: #e2e8f0;
+    --gray-600: #475569;
+    --gray-800: #1e293b;
+  }
+
+  body {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    min-height: 100vh;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    width: 280px;
+    background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(20px);
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 1000;
+    transition: all 0.3s;
+  }
+
+  .sidebar-brand {
+    padding: 2rem 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .sidebar-brand h4 {
+    font-size: 1.6rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #a5b4fc, #c084fc, #f9a8d4);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .sidebar-brand small {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.7rem;
+  }
+
+  .nav-link-admin {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0.8rem 1.5rem;
+    margin: 0.3rem 1rem;
+    color: rgba(255, 255, 255, 0.7);
+    border-radius: 1rem;
+    transition: all 0.3s;
+    cursor: pointer;
+  }
+
+  .nav-link-admin:hover {
+    background: rgba(99, 102, 241, 0.2);
+    color: white;
+    transform: translateX(5px);
+  }
+
+  .nav-link-admin.active {
+    background: linear-gradient(90deg, rgba(99, 102, 241, 0.3), rgba(236, 72, 153, 0.2));
+    color: white;
+  }
+
+  /* Main Content */
+  .main-content {
+    margin-left: 280px;
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  .topbar {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 1rem 2rem;
+    position: sticky;
+    top: 0;
+    z-index: 99;
+  }
+
+  .section {
+    display: none;
+    animation: fadeIn 0.3s ease;
+    padding: 2rem;
+  }
+
+  .section.active {
+    display: block;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Cards */
+  .card-premium {
+    background: white;
+    border: none;
+    border-radius: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s;
+    overflow: hidden;
+  }
+
+  .card-premium:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Stats Cards */
+  .stat-card {
+    background: white;
+    border-radius: 1.25rem;
+    padding: 1.5rem;
+    transition: all 0.3s;
+  }
+
+  .stat-value {
+    font-size: 2rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--dark), var(--primary));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .stat-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: #6b7280;
+  }
+
+  .icon-premium {
+    width: 48px;
+    height: 48px;
+    border-radius: 1rem;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+  }
+
+  /* Buttons */
+  .btn-gradient {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    border: none;
+    border-radius: 0.75rem;
+    padding: 0.6rem 1.2rem;
+    color: white;
+    font-weight: 600;
+    transition: all 0.3s;
+  }
+
+  .btn-gradient:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4);
+  }
+
+  .btn-outline-danger {
+    border: 1px solid var(--danger);
+    color: var(--danger);
+    background: white;
+    border-radius: 0.5rem;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.8rem;
+    transition: all 0.2s;
+  }
+
+  .btn-outline-danger:hover {
+    background: var(--danger);
+    color: white;
+  }
+
+  /* Tables */
+  .table-premium {
+    background: white;
+    border-radius: 1rem;
+    overflow: hidden;
+  }
+
+  .table-premium thead {
+    background: var(--gray-50);
+  }
+
+  .table-premium th {
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--gray-600);
+  }
+
+  /* Badges */
+  .badge-admin {
+    background: linear-gradient(135deg, #ef4444, #f97316);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 700;
+  }
+
+  .badge-user {
+    background: linear-gradient(135deg, #6b7280, #9ca3af);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 700;
+  }
+
+  /* Loading Spinner */
+  .loading-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(99, 102, 241, 0.3);
+    border-radius: 50%;
+    border-top-color: var(--primary);
+    animation: spin 1s ease-in-out infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* Toast Notification */
+  .toast-notification {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: white;
+    border-radius: 0.75rem;
+    padding: 1rem 1.5rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    z-index: 1100;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    animation: slideIn 0.3s ease;
+  }
+
+  @keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+
+  /* Responsive */
+  @media (max-width: 991px) {
+    .sidebar {
+      transform: translateX(-100%);
+    }
+    .sidebar.open {
+      transform: translateX(0);
+    }
+    .main-content {
+      margin-left: 0;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <h4><i class="bi bi-shield-lock-fill me-2"></i>Admin Portal</h4>
+    <small>finVerse Control Center</small>
+  </div>
+  <nav>
+    <div class="nav-link-admin active" onclick="showSection('overview')">
+      <i class="bi bi-speedometer2"></i> Overview
+    </div>
+    <div class="nav-link-admin" onclick="showSection('users')">
+      <i class="bi bi-people-fill"></i> User Management
+    </div>
+    <div class="nav-link-admin" onclick="showSection('categories')">
+      <i class="bi bi-tags-fill"></i> Global Categories
+    </div>
+    <div class="nav-link-admin" onclick="showSection('transactions')">
+      <i class="bi bi-list-ul"></i> All Transactions
+    </div>
+    <hr style="margin: 1rem; border-color: rgba(255,255,255,0.1);">
+    <div class="nav-link-admin" onclick="goToDashboard()">
+      <i class="bi bi-box-arrow-left"></i> Back to Dashboard
+    </div>
+    <div class="nav-link-admin" onclick="logout()">
+      <i class="bi bi-box-arrow-right"></i> Logout
+    </div>
+  </nav>
+</div>
+
+<!-- Main Content -->
+<div class="main-content" id="mainContent">
+  <div class="topbar d-flex justify-content-between align-items-center">
+    <div>
+      <button class="btn btn-light d-lg-none me-2" onclick="toggleSidebar()"><i class="bi bi-list"></i></button>
+      <span class="fw-bold fs-5" id="pageTitle">Admin Overview</span>
+    </div>
+    <div class="d-flex gap-3 align-items-center">
+      <div class="d-flex align-items-center gap-2">
+        <div class="rounded-circle bg-gradient p-2 text-white" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+          <i class="bi bi-person-fill"></i>
+        </div>
+        <div>
+          <div class="small fw-bold" id="adminName">Admin User</div>
+          <div class="small text-muted">Administrator</div>
+        </div>
+      </div>
+      <button class="btn-gradient btn-sm" onclick="refreshAllData()">
+        <i class="bi bi-arrow-repeat me-1"></i>Refresh
+      </button>
+    </div>
+  </div>
+
+  <!-- Overview Section -->
+  <div id="overview" class="section active">
+    <div class="row g-4 mb-4">
+      <div class="col-md-3">
+        <div class="stat-card">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <div class="stat-label">Total Users</div>
+              <div class="stat-value" id="statTotalUsers">0</div>
+            </div>
+            <div class="icon-premium"><i class="bi bi-people-fill fs-4"></i></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="stat-card">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <div class="stat-label">Total Income</div>
+              <div class="stat-value" id="statTotalIncome">₹0</div>
+            </div>
+            <div class="icon-premium" style="background: linear-gradient(135deg, #10b981, #34d399);"><i class="bi bi-arrow-down-circle-fill fs-4"></i></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="stat-card">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <div class="stat-label">Total Expenses</div>
+              <div class="stat-value" id="statTotalExpenses">₹0</div>
+            </div>
+            <div class="icon-premium" style="background: linear-gradient(135deg, #ef4444, #f97316);"><i class="bi bi-arrow-up-circle-fill fs-4"></i></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="stat-card">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <div class="stat-label">Transactions</div>
+              <div class="stat-value" id="statTotalTransactions">0</div>
+            </div>
+            <div class="icon-premium" style="background: linear-gradient(135deg, #3b82f6, #06b6d4);"><i class="bi bi-list-ul fs-4"></i></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+      <div class="col-lg-8">
+        <div class="card-premium p-4">
+          <h6 class="fw-bold mb-3"><i class="bi bi-graph-up me-2 text-primary"></i>System Revenue Trend</h6>
+          <canvas id="revenueChart" height="250"></canvas>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="card-premium p-4">
+          <h6 class="fw-bold mb-3"><i class="bi bi-pie-chart me-2 text-primary"></i>User Distribution</h6>
+          <canvas id="userChart" height="200"></canvas>
+          <div class="mt-3" id="userStats"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-12">
+        <div class="card-premium p-4">
+          <h6 class="fw-bold mb-3"><i class="bi bi-trophy me-2 text-warning"></i>Recent Activity</h6>
+          <div id="recentActivity" class="list-group list-group-flush"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- User Management Section -->
+  <div id="users" class="section">
+    <div class="card-premium p-4">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h5 class="fw-bold mb-0"><i class="bi bi-people-fill me-2 text-primary"></i>User Management</h5>
+        <button class="btn-gradient" data-bs-toggle="modal" data-bs-target="#addUserModal">
+          <i class="bi bi-plus-circle me-1"></i>Add New User
+        </button>
+      </div>
+      
+      <div class="table-responsive">
+        <table class="table table-premium">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Joined</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="userTableBody">
+            <tr><td colspan="6" class="text-center py-4"><div class="loading-spinner"></div> Loading users......</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Global Categories Section -->
+  <div id="categories" class="section">
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="card-premium p-4">
+          <h6 class="fw-bold mb-3"><i class="bi bi-arrow-down-circle-fill text-success me-2"></i>Income Categories</h6>
+          <div id="incomeCategoriesList" class="mb-3"></div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card-premium p-4">
+          <h6 class="fw-bold mb-3"><i class="bi bi-arrow-up-circle-fill text-danger me-2"></i>Expense Categories</h6>
+          <div id="expenseCategoriesList" class="mb-3"></div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card-premium p-4">
+          <h6 class="fw-bold mb-3"><i class="bi bi-calendar2-check-fill text-primary me-2"></i>Commitment Categories</h6>
+          <div id="commitCategoriesList" class="mb-3"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- All Transactions Section -->
+  <div id="transactions" class="section">
+    <div class="card-premium p-4">
+      <h5 class="fw-bold mb-3"><i class="bi bi-list-ul me-2 text-primary"></i>All User Transactions</h5>
+      <div class="table-responsive">
+        <table class="table table-premium">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>User</th>
+              <th>Type</th>
+              <th>Category</th>
+              <th>Amount</th>
+              <th>Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="transactionsTableBody">
+            <tr><td colspan="7" class="text-center py-4"><div class="loading-spinner"></div> Loading transactions......</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add User Modal -->
+<div class="modal fade" id="addUserModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-4">
+      <div class="modal-header border-0">
+        <h5 class="modal-title fw-bold">Add New User</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label">First Name</label>
+          <input type="text" id="newUserFirstName" class="form-control" placeholder="John">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Last Name</label>
+          <input type="text" id="newUserLastName" class="form-control" placeholder="Doe">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Email</label>
+          <input type="email" id="newUserEmail" class="form-control" placeholder="john@example.com">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Password</label>
+          <input type="password" id="newUserPassword" class="form-control" placeholder="********">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Role</label>
+          <select id="newUserRole" class="form-select">
+            <option value="USER">Regular User</option>
+            <option value="ADMIN">Administrator</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer border-0">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn-gradient" onclick="addNewUser()">Create User</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// ============================================
+// CONFIGURATION - UPDATE THIS WITH YOUR BACKEND URL
+// ============================================
+const API_BASE = "http://localhost:8081/api";
+let charts = {};
+let currentAdmin = JSON.parse(localStorage.getItem("currentUser") || "{}");
+
+// Check admin access
+const userRole = localStorage.getItem("userRole");
+if (userRole !== "ADMIN") {
+  alert("Access Denied! Admin privileges required.");
+  window.location.href = "index.html";
+}
+
+// Display admin name
+document.getElementById("adminName").innerHTML = currentAdmin.first_name + " " + (currentAdmin.last_name || "");
+
+// ============================================
+// CORE DATA FETCHING FUNCTIONS
+// ============================================
+
+// Generic fetch function with error handling
+async function fetchData(endpoint) {
+  try {
+    console.log(`Fetching: ${API_BASE}${endpoint}`);
+    const response = await fetch(`${API_BASE}${endpoint}`);
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+    const data = await response.json();
+    console.log(`Data from ${endpoint}:`, data);
+    return data;
+  } catch (error) {
+    console.error(`Error fetching ${endpoint}:`, error);
+    return null;
+  }
+}
+
+// Load Overview Data with REAL data
+async function loadOverview() {
+  try {
+    console.log("Loading overview data...");
+    
+    // Fetch all data in parallel
+    const [users, allIncome, allExpense] = await Promise.all([
+      fetchData('/users'),
+      fetchData('/income/all'),
+      fetchData('/expenses/all')
+    ]);
+    
+    console.log("Users data:", users);
+    console.log("Income data:", allIncome);
+    console.log("Expense data:", allExpense);
+    
+    // Calculate statistics
+    const totalUsers = users ? users.length : 0;
+    const totalIncome = allIncome ? allIncome.reduce((sum, t) => sum + (parseFloat(t.amount) || 0), 0) : 0;
+    const totalExpense = allExpense ? allExpense.reduce((sum, t) => sum + (parseFloat(t.amount) || 0), 0) : 0;
+    const totalTransactions = (allIncome ? allIncome.length : 0) + (allExpense ? allExpense.length : 0);
+    
+    // Update UI
+    document.getElementById('statTotalUsers').innerHTML = totalUsers;
+    document.getElementById('statTotalIncome').innerHTML = '₹' + totalIncome.toLocaleString('en-IN');
+    document.getElementById('statTotalExpenses').innerHTML = '₹' + totalExpense.toLocaleString('en-IN');
+    document.getElementById('statTotalTransactions').innerHTML = totalTransactions;
+    
+    // Prepare chart data
+    const monthlyData = {};
+    
+    // Process income transactions
+    if (allIncome && allIncome.length > 0) {
+      allIncome.forEach(t => {
+        if (t.date) {
+          const date = new Date(t.date);
+          const month = date.toLocaleString('default', { month: 'short' });
+          if (!monthlyData[month]) {
+            monthlyData[month] = { income: 0, expense: 0 };
+          }
+          const amount = parseFloat(t.amount) || 0;
+          monthlyData[month].income += amount;
+        }
+      });
+    }
+    
+    // Process expense transactions
+    if (allExpense && allExpense.length > 0) {
+      allExpense.forEach(t => {
+        if (t.date) {
+          const date = new Date(t.date);
+          const month = date.toLocaleString('default', { month: 'short' });
+          if (!monthlyData[month]) {
+            monthlyData[month] = { income: 0, expense: 0 };
+          }
+          const amount = parseFloat(t.amount) || 0;
+          monthlyData[month].expense += amount;
+        }
+      });
+    }
+    
+    // Update Revenue Chart
+    const months = Object.keys(monthlyData).sort((a, b) => {
+      const monthOrder = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      return monthOrder.indexOf(a) - monthOrder.indexOf(b);
+    });
+    
+    if (charts.revenue) charts.revenue.destroy();
+    if (months.length > 0) {
+      const ctx = document.getElementById('revenueChart').getContext('2d');
+      charts.revenue = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: months,
+          datasets: [
+            { label: 'Income', data: months.map(m => monthlyData[m].income), backgroundColor: '#10b981' },
+            { label: 'Expense', data: months.map(m => monthlyData[m].expense), backgroundColor: '#ef4444' }
+          ]
+        },
+        options: { responsive: true, maintainAspectRatio: true }
+      });
+    }
+    
+    // Update User Distribution Chart
+    if (users && users.length > 0) {
+      const adminCount = users.filter(u => u.role === 'ADMIN').length;
+      const regularCount = users.length - adminCount;
+      if (charts.user) charts.user.destroy();
+      const userCtx = document.getElementById('userChart').getContext('2d');
+      charts.user = new Chart(userCtx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Regular Users', 'Admins'],
+          datasets: [{ data: [regularCount, adminCount], backgroundColor: ['#3b82f6', '#ef4444'] }]
+        }
+      });
+      document.getElementById('userStats').innerHTML = `
+        <div class="small">👥 ${regularCount} Regular Users</div>
+        <div class="small">🔒 ${adminCount} Administrators</div>
+      `;
+    }
+    
+    // Get user names for display
+    const userMap = new Map();
+    if (users) {
+      users.forEach(u => {
+        const userId = u.id || u.user_id;
+        const userName = `${u.first_name || ''} ${u.last_name || ''}`.trim() || u.email || `User ${userId}`;
+        userMap.set(userId, userName);
+      });
+    }
+    
+    // Combine and sort all transactions for recent activity
+    const allTransactions = [];
+    
+    // Add income transactions with proper type
+    if (allIncome && allIncome.length > 0) {
+      allIncome.forEach(t => {
+        const userId = t.user_id || t.userId;
+        allTransactions.push({
+          id: t.id,
+          amount: parseFloat(t.amount) || 0,
+          category: t.category,
+          date: t.date,
+          type: 'INCOME',
+          displayType: 'Income',
+          userName: userMap.get(userId) || `User ${userId}`,
+          userId: userId
+        });
+      });
+    }
+    
+    // Add expense transactions with proper type
+    if (allExpense && allExpense.length > 0) {
+      allExpense.forEach(t => {
+        const userId = t.user_id || t.userId;
+        allTransactions.push({
+          id: t.id,
+          amount: parseFloat(t.amount) || 0,
+          category: t.category,
+          date: t.date,
+          type: 'EXPENSE',
+          displayType: 'Expense',
+          userName: userMap.get(userId) || `User ${userId}`,
+          userId: userId
+        });
+      });
+    }
+    
+    // Sort by date (most recent first)
+    allTransactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+    const recentTransactions = allTransactions.slice(0, 10);
+    
+    console.log("Recent Transactions:", recentTransactions);
+    
+    // Display recent activity with correct types
+    const recentActivityDiv = document.getElementById('recentActivity');
+    if (recentTransactions.length > 0) {
+      recentActivityDiv.innerHTML = recentTransactions.map(t => {
+        const isExpense = t.type === 'EXPENSE';
+        const badgeClass = isExpense ? 'bg-danger' : 'bg-success';
+        const badgeText = isExpense ? 'Expense' : 'Income';
+        
+        return `
+          <div class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+              <span class="badge ${badgeClass} me-2">${badgeText}</span>
+              <span><strong>${t.userName}</strong> - ${t.category || 'Uncategorized'} - ₹${t.amount.toLocaleString('en-IN')}</span>
+            </div>
+            <small class="text-muted">${new Date(t.date).toLocaleDateString()}</small>
+          </div>
+        `;
+      }).join('');
+    } else {
+      recentActivityDiv.innerHTML = '<div class="text-center py-3 text-muted">No recent transactions found. Please add some transactions first.</div>';
+    }
+    
+  } catch (error) {
+    console.error("Error loading overview:", error);
+    showToast('Error loading dashboard data: ' + error.message, 'error');
+    document.getElementById('statTotalUsers').innerHTML = '0';
+    document.getElementById('statTotalIncome').innerHTML = '₹0';
+    document.getElementById('statTotalExpenses').innerHTML = '₹0';
+    document.getElementById('statTotalTransactions').innerHTML = '0';
+    document.getElementById('recentActivity').innerHTML = '<div class="text-center py-3 text-danger">Error loading transactions. Please check if backend is running.</div>';
+  }
+}
+
+// Load Users with REAL data
+async function loadUsers() {
+  try {
+    const users = await fetchData('/users');
+    const tbody = document.getElementById('userTableBody');
+    
+    if (users && users.length > 0) {
+      tbody.innerHTML = users.map(u => `
+        <tr>
+          <td>${u.id || u.user_id || '-'}</td>
+          <td><strong>${u.first_name || ''} ${u.last_name || ''}</strong></td>
+          <td>${u.email || '-'}</td>
+          <td><span class="${u.role === 'ADMIN' ? 'badge-admin' : 'badge-user'}">${u.role || 'USER'}</span></td>
+          <td>${u.created_at ? new Date(u.created_at).toLocaleDateString() : '-'}</td>
+          <td>
+            <button class="btn-outline-danger btn-sm" onclick="deleteUser(${u.id || u.user_id})"><i class="bi bi-trash"></i></button>
+            </td>
+         </tr>
+      `).join('');
+    } else {
+      tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-muted">No users found</td></tr>';
+    }
+  } catch (error) {
+    console.error("Error loading users:", error);
+    document.getElementById('userTableBody').innerHTML = '<tr><td colspan="6" class="text-center py-4 text-danger">Error loading users</td></tr>';
+  }
+}
+
+// Load All Transactions with REAL data
+async function loadAllTransactions() {
+  try {
+    const [income, expense, users] = await Promise.all([
+      fetchData('/income/all'),
+      fetchData('/expenses/all'),
+      fetchData('/users')
+    ]);
+    
+    const userMap = new Map();
+    if (users) {
+      users.forEach(u => {
+        userMap.set(u.id || u.user_id, `${u.first_name || ''} ${u.last_name || ''}`.trim() || u.email);
+      });
+    }
+    
+    const allTransactions = [];
+    if (income) {
+      income.forEach(i => allTransactions.push({ ...i, type: 'Income', transaction_type: 'income' }));
+    }
+    if (expense) {
+      expense.forEach(e => allTransactions.push({ ...e, type: 'Expense', transaction_type: 'expense' }));
+    }
+    
+    allTransactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+    
+    const tbody = document.getElementById('transactionsTableBody');
+    if (allTransactions.length > 0) {
+      tbody.innerHTML = allTransactions.slice(0, 100).map(t => {
+        const userName = userMap.get(t.user_id || t.userId) || `User ${t.user_id || t.userId}`;
+        return `
+          <tr>
+            <td>${t.id || t.transaction_id || '-'}</td>
+            <td><strong>${userName}</strong></td>
+            <td><span class="badge ${t.type === 'Income' ? 'bg-success' : 'bg-danger'}">${t.type}</span></td>
+            <td>${t.category || '-'}</td>
+            <td class="fw-bold">₹${(parseFloat(t.amount) || 0).toLocaleString('en-IN')}</td>
+            <td>${t.date ? new Date(t.date).toLocaleDateString() : '-'}</td>
+            <td><button class="btn-outline-danger btn-sm" onclick="deleteTransaction(${t.id}, '${t.type}')"><i class="bi bi-trash"></i></button></td>
+          </tr>
+        `;
+      }).join('');
+    } else {
+      tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-muted">No transactions found</td></tr>';
+    }
+  } catch (error) {
+    console.error("Error loading transactions:", error);
+    document.getElementById('transactionsTableBody').innerHTML = '<tr><td colspan="7" class="text-center py-4 text-danger">Error loading transactions</td></tr>';
+  }
+}
+
+async function loadGlobalCategories() {
+  try {
+    console.log("Fetching global categories...");
+    const res = await fetch(`${API_BASE}/categories/global`);
+
+    if (!res.ok) {
+      console.error("Failed to fetch categories, status:", res.status);
+      throw new Error(`Failed to load: ${res.status}`);
+    }
+
+    const data = await res.json();
+    console.log("Raw categories data from backend:", data);
+    
+    // Transform the data if needed
+    let formattedData = {
+      income: [],
+      expense: [],
+      commit: []
+    };
+    
+    // Case 1: Data is already in {income: [], expense: [], commit: []} format
+    if (data.income || data.expense || data.commit) {
+      formattedData.income = data.income || [];
+      formattedData.expense = data.expense || [];
+      formattedData.commit = data.commit || [];
+    }
+    // Case 2: Data is an array of categories with a 'type' field
+    else if (Array.isArray(data)) {
+      data.forEach(cat => {
+        if (cat.type === 'income' || cat.type === 'INCOME') {
+          formattedData.income.push(cat);
+        } else if (cat.type === 'expense' || cat.type === 'EXPENSE') {
+          formattedData.expense.push(cat);
+        } else if (cat.type === 'commit' || cat.type === 'COMMIT' || cat.type === 'commitment') {
+          formattedData.commit.push(cat);
+        }
+      });
+    }
+    // Case 3: Data is in some other nested structure
+    else if (data.data) {
+      return loadGlobalCategories(); // Recursive call with the nested data
+    }
+    
+    console.log("Formatted categories for display:", formattedData);
+    displayCategories(formattedData);
+
+  } catch (e) {
+    console.error("Error loading categories:", e);
+    // Show error messages in the UI
+    document.getElementById('incomeCategoriesList').innerHTML = '<p class="text-danger text-center py-2">Error loading categories. Please check backend connection.</p>';
+    document.getElementById('expenseCategoriesList').innerHTML = '<p class="text-danger text-center py-2">Error loading categories. Please check backend connection.</p>';
+    document.getElementById('commitCategoriesList').innerHTML = '<p class="text-danger text-center py-2">Error loading categories. Please check backend connection.</p>';
+  }
+}
+
+function displayCategories(cats) {
+  console.log("Displaying categories:", cats);
+  
+  // Display Income Categories
+  const incomeContainer = document.getElementById('incomeCategoriesList');
+  if (cats.income && cats.income.length > 0) {
+    incomeContainer.innerHTML = cats.income.map(c => `
+      <div class="d-flex justify-content-between align-items-center p-2 border-bottom">
+        <span><i class="bi bi-tag me-2 text-success"></i>${c.name || c.category_name || c.title}</span>
+        <button class="btn-outline-danger btn-sm" onclick="deleteCategory('income', ${c.id || c.category_id})">
+          <i class="bi bi-trash"></i>
+        </button>
+      </div>
+    `).join('');
+  } else {
+    incomeContainer.innerHTML = `
+      <div class="text-center py-3 text-muted">
+        <i class="bi bi-info-circle"></i> No income categories<br>
+      </div>
+    `;
+  }
+  
+  // Display Expense Categories
+  const expenseContainer = document.getElementById('expenseCategoriesList');
+  if (cats.expense && cats.expense.length > 0) {
+    expenseContainer.innerHTML = cats.expense.map(c => `
+      <div class="d-flex justify-content-between align-items-center p-2 border-bottom">
+        <span><i class="bi bi-tag me-2 text-danger"></i>${c.name || c.category_name || c.title}</span>
+        <button class="btn-outline-danger btn-sm" onclick="deleteCategory('expense', ${c.id || c.category_id})">
+          <i class="bi bi-trash"></i>
+        </button>
+      </div>
+    `).join('');
+  } else {
+    expenseContainer.innerHTML = `
+      <div class="text-center py-3 text-muted">
+        <i class="bi bi-info-circle"></i> No expense categories<br>
+      </div>
+    `;
+  }
+  
+  // Display Commitment Categories
+  const commitContainer = document.getElementById('commitCategoriesList');
+  if (cats.commit && cats.commit.length > 0) {
+    commitContainer.innerHTML = cats.commit.map(c => `
+      <div class="d-flex justify-content-between align-items-center p-2 border-bottom">
+        <span><i class="bi bi-tag me-2 text-primary"></i>${c.name || c.category_name || c.title}</span>
+        <button class="btn-outline-danger btn-sm" onclick="deleteCategory('commit', ${c.id || c.category_id})">
+          <i class="bi bi-trash"></i>
+        </button>
+      </div>
+    `).join('');
+  } else {
+    commitContainer.innerHTML = `
+      <div class="text-center py-3 text-muted">
+        <i class="bi bi-info-circle"></i> No commitment categories<br>
+      </div>
+    `;
+  }
+}
+
+// ============================================
+// CRUD OPERATIONS
+// ============================================
+
+// Add New User
+async function addNewUser() {
+  const firstName = document.getElementById('newUserFirstName').value;
+  const lastName = document.getElementById('newUserLastName').value;
+  const email = document.getElementById('newUserEmail').value;
+  const password = document.getElementById('newUserPassword').value;
+  const role = document.getElementById('newUserRole').value;
+  
+  if (!firstName || !email || !password) {
+    showToast('Please fill all required fields', 'error');
+    return;
+  }
+  
+  try {
+    const response = await fetch(`${API_BASE}/users`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ first_name: firstName, last_name: lastName, email, password, role })
+    });
+    
+    if (response.ok) {
+      showToast('User created successfully!', 'success');
+      bootstrap.Modal.getInstance(document.getElementById('addUserModal')).hide();
+      document.getElementById('newUserFirstName').value = '';
+      document.getElementById('newUserLastName').value = '';
+      document.getElementById('newUserEmail').value = '';
+      document.getElementById('newUserPassword').value = '';
+      loadUsers();
+      loadOverview();
+    } else {
+      const error = await response.text();
+      showToast(`Error: ${error}`, 'error');
+    }
+  } catch (error) {
+    console.error("Error adding user:", error);
+    showToast('Error adding user. Is the backend running?', 'error');
+  }
+}
+
+// Delete User
+async function deleteUser(id) {
+  if (confirm('Delete this user? This will delete all their data!')) {
+    try {
+      const response = await fetch(`${API_BASE}/users/${id}`, { method: 'DELETE' });
+      if (response.ok) {
+        showToast('User deleted successfully', 'success');
+        loadUsers();
+        loadOverview();
+      } else {
+        showToast('Error deleting user', 'error');
+      }
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      showToast('Error deleting user', 'error');
+    }
+  }
+}
+
+// Delete Category
+async function deleteCategory(type, id) {
+  if (!id) {
+    showToast('Invalid category ID', 'error');
+    return;
+  }
+  
+  if (confirm(`Delete this ${type} category? It will affect all users!`)) {
+    try {
+      console.log(`Deleting ${type} category with ID:`, id);
+      const response = await fetch(`${API_BASE}/categories/global/${id}`, { 
+        method: 'DELETE' 
+      });
+      
+      if (response.ok) {
+        showToast('Category deleted successfully', 'success');
+        await loadGlobalCategories();
+      } else {
+        const errorText = await response.text();
+        console.error("Delete error:", errorText);
+        showToast(`Error deleting category: ${response.status}`, 'error');
+      }
+    } catch (error) {
+      console.error("Error deleting category:", error);
+      showToast('Error deleting category', 'error');
+    }
+  }
+}
+
+// Delete Transaction
+async function deleteTransaction(id, type) {
+  if (confirm('Delete this transaction?')) {
+    const endpoint = type === 'Income' ? '/income' : '/expenses';
+    try {
+      const response = await fetch(`${API_BASE}${endpoint}/${id}`, { method: 'DELETE' });
+      if (response.ok) {
+        showToast('Transaction deleted', 'success');
+        loadAllTransactions();
+        loadOverview();
+      } else {
+        showToast('Error deleting transaction', 'error');
+      }
+    } catch (error) {
+      console.error("Error deleting transaction:", error);
+      showToast('Error deleting transaction', 'error');
+    }
+  }
+}
+
+// ============================================
+// HELPER FUNCTIONS
+// ============================================
+
+function showToast(message, type) {
+  const toast = document.createElement('div');
+  toast.className = 'toast-notification';
+  toast.innerHTML = `<i class="bi bi-${type === 'success' ? 'check-circle-fill text-success' : 'exclamation-triangle-fill text-danger'}"></i> ${message}`;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
+}
+
+function refreshAllData() {
+  loadOverview();
+  loadUsers();
+  loadGlobalCategories();
+  loadAllTransactions();
+  showToast('All data refreshed!', 'success');
+}
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+}
+
+function showSection(sectionId) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById(sectionId).classList.add('active');
+  
+  const titles = {
+    overview: 'Admin Overview',
+    users: 'User Management',
+    categories: 'Global Categories',
+    transactions: 'All Transactions'
+  };
+  document.getElementById('pageTitle').innerHTML = titles[sectionId];
+  
+  // Load data when section is shown
+  if (sectionId === 'users') loadUsers();
+  if (sectionId === 'categories') loadGlobalCategories();
+  if (sectionId === 'transactions') loadAllTransactions();
+}
+
+function goToDashboard() {
+  window.location.href = "index.html";
+}
+
+function logout() {
+  localStorage.clear();
+  window.location.href = "login.html";
+}
+
+// ============================================
+// INITIALIZATION
+// ============================================
+window.onload = () => {
+  console.log("Admin panel loaded");
+  loadOverview();
+  loadUsers();
+  loadGlobalCategories();
+  loadAllTransactions();
+};
+</script>
+</body>
+</html>
