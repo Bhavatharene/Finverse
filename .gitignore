@@ -1,11 +1,19 @@
-/target/
-*.log
+# Compiled files
 *.class
-*.jar
-*.war
-*.ear
-*.iml
-.idea/
+target/
+
+# IDE files
 .vscode/
-node_modules/
-.env
+.idea/
+*.iml
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Application properties (if contains secrets)
+application.properties
+application-dev.properties
