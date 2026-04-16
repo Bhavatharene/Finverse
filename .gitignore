@@ -1,19 +1,14 @@
-# Compiled files
-*.class
+# Backend
 target/
-
-# IDE files
-.vscode/
-.idea/
-*.iml
-
-# Logs
 *.log
+*.class
+*.jar
 
-# OS files
+# Frontend
+node_modules/
+dist/
+build/
+
+# General
+.env
 .DS_Store
-Thumbs.db
-
-# Application properties (if contains secrets)
-application.properties
-application-dev.properties
